@@ -1,16 +1,15 @@
 package dao;
 
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.PreparedStatement;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
 
 public class DBUtil {
-    private static final String URL = "jdbc:mysql://127.0.01:3306/java_image_server?characterEncoding=utf8";
+    private static final String URL = "jdbc:mysql://127.0.0.1:3306/java_image_server?characterEncoding=utf8";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "root";
 
