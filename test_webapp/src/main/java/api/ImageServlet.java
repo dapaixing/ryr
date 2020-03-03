@@ -13,4 +13,14 @@ public class ImageServlet extends HttpServlet {
         //这个代码就是把hello这个字符串放到http相应的body中了
         resp.getWriter().write("hello");
     }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doPost(req, resp);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doDelete(req, resp);
+    }
 }
