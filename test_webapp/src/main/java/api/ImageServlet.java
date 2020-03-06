@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dao.Image;
 import dao.ImageDao;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileItemIterator;
@@ -91,30 +92,35 @@ public class ImageServlet extends HttpServlet {
         FileItem fileItem = items.get(0);
         Image image = new Image();
         image.setImageName(fileItem.getName());
-        image.setSize((int)fileItem.getSize());
+        image.setSize((int) fileItem.getSize());
         //手动获取一下当前日期，并转成格式化日期
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         image.setUploadTime(simpleDateFormat.format(new Date()));
         image.setContentType(fileItem.getContentType());
         //自己构造一个路径来保存，引入时间戳是为了让文件路径能够唯一
-        image.setPath("D:\\代码\\2020\\test_webapp\\src\\image\\"+System.currentTimeMillis()+""+image.getImageName());
-        image.setMd5("11223344");
+        image.setPath("D:\\代码\\2020\\test_webapp\\src\\image\\" + System.currentTimeMillis() + "" + image.getMd5());
+        image.setMd5(DigestUtils.md5Hex(fileItem.get()));
         //存入数据库
         ImageDao imageDao = new ImageDao();
+        //看数据库中是否存在相同Md5值的图片，不存在，返回null
+        Image existImage = imageDao.selectByMd5(image.getMd5());
         imageDao.insert(image);
         //2、获取图片的内容信息，并写入磁盘信息
-        File file = new File(image.getPath());
-        try {
-            fileItem.write(file);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (existImage == null) {
+            File file = new File(image.getPath());
+            try {
+                fileItem.write(file);
+            } catch (Exception e) {
+                e.printStackTrace();
 
-            resp.setContentType("application/json; charset=utf-8");
-            resp.getWriter().write("{\"ok\": false,\"reason\":\"写入磁盘失败\"}");
+                resp.setContentType("application/json; charset=utf-8");
+                resp.getWriter().write("{\"ok\": false,\"reason\":\"写入磁盘失败\"}");
+            }
+            //3、给客户端返回一个结果数据
+//        resp.setContentType("application/json; charset=utf-8");
+//        resp.getWriter().write("{\"ok\": true}");
+            resp.sendRedirect("index.html");
         }
-        //3、给客户端返回一个结果数据
-        resp.setContentType("application/json; charset=utf-8");
-        resp.getWriter().write("{\"ok\": true}");
     }
 
     @Override
